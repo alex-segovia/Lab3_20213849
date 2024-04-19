@@ -11,4 +11,7 @@ import java.util.List;
 public interface ClinicaRepository extends JpaRepository<Clinica,Integer> {
     @Query(nativeQuery = true,value = "select * from clinica")
     List<Clinica> listarTodasLasClinicas();
+
+    @Query(nativeQuery = true,value = "select * from clinica where id=?1")
+    Clinica obtenerClinicaPorId(int id);
 }
