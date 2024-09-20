@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -106,9 +107,10 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("usuarioId",usuario.getId().toString());
                             Log.d("usuarioUsername",usuario.getUsername());
                             Intent intent = new Intent(MainActivity.this, PomodoroActivity.class);
+                            intent.putExtra("usuario",usuario);
                             startActivity(intent);
                         }else{
-                            Log.d("error","Error en el web service");
+                            Toast.makeText(MainActivity.this,"El usuario y la contraseña ingresados no existe",Toast.LENGTH_LONG).show();
                         }
                     }
 

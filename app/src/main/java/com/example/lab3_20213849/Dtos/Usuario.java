@@ -1,6 +1,8 @@
 package com.example.lab3_20213849.Dtos;
 
-public class Usuario {
+import java.io.Serializable;
+
+public class Usuario implements Serializable {
     private Integer id;
     private String username;
     private String email;
