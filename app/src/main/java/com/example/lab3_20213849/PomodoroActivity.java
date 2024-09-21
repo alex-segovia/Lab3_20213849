@@ -44,6 +44,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PomodoroActivity extends AppCompatActivity {
 
+    private Usuario usuario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,8 +57,12 @@ public class PomodoroActivity extends AppCompatActivity {
             return insets;
         });
 
-        Intent intent = getIntent();
-        Usuario usuario = (Usuario)intent.getSerializableExtra("usuario");
+        if (savedInstanceState != null){
+            usuario = (Usuario) savedInstanceState.getSerializable("usuario");
+        }else{
+            Intent intent = getIntent();
+            usuario = (Usuario)intent.getSerializableExtra("usuario");
+        }
 
         TextView nombreUsuario = findViewById(R.id.nombresApellidos);
         String nuevoNombre = usuario.getFirstName() + " " + usuario.getLastName();
@@ -139,6 +145,7 @@ public class PomodoroActivity extends AppCompatActivity {
                                                     textoContador.setText(nuevoTexto);
                                                 }else if (workInfoDescanso.getState() == WorkInfo.State.SUCCEEDED){
                                                     textoInfoDescanso.setText("Fin del descanso");
+                                                    textoContador.setText("00:00");
 
                                                     MaterialAlertDialogBuilder dialogFinDescanso = new MaterialAlertDialogBuilder(PomodoroActivity.this);
                                                     dialogFinDescanso.setTitle("Atención");
@@ -257,6 +264,7 @@ public class PomodoroActivity extends AppCompatActivity {
                                                     textoContador.setText(nuevoTexto);
                                                 }else if (workInfoDescanso.getState() == WorkInfo.State.SUCCEEDED){
                                                     textoInfoDescanso.setText("Fin del descanso");
+                                                    textoContador.setText("00:00");
 
                                                     MaterialAlertDialogBuilder dialogFinDescanso = new MaterialAlertDialogBuilder(PomodoroActivity.this);
                                                     dialogFinDescanso.setTitle("Atención");
@@ -326,5 +334,11 @@ public class PomodoroActivity extends AppCompatActivity {
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("usuario",usuario);
     }
 }
