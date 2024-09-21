@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.work.WorkManager;
 
 import com.example.lab3_20213849.Dtos.ToDo;
 import com.example.lab3_20213849.Dtos.Usuario;
@@ -80,8 +81,11 @@ public class TareasActivity extends AppCompatActivity {
                     public void onResponse(Call<ToDo> call, Response<ToDo> response) {
                         if(response.isSuccessful()){
                             ToDo todoResponse = response.body();
-                            Toast.makeText(TareasActivity.this,"Se cambió el estado de la tarea " + todoResponse.getTodo() + " a " + todoResponse.isCompleted(),Toast.LENGTH_LONG).show();
-                            onBackPressed();
+                            Toast.makeText(TareasActivity.this,"Estado: " + (todoResponse.isCompleted()?"Completada":"No completada") + ".\n Tarea: " + todoResponse.getTodo(),Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent();
+                            intent.putExtra("usuario",usuario);
+                            setResult(RESULT_OK,intent);
+                            finish();
                         }
                     }
 
@@ -107,9 +111,23 @@ public class TareasActivity extends AppCompatActivity {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
             finish();
+            return true;
         }else if (item.getItemId()==android.R.id.home){
-            onBackPressed();
+            Intent intent = new Intent();
+            intent.putExtra("usuario",usuario);
+            setResult(RESULT_OK,intent);
+            finish();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent();
+        intent.putExtra("usuario",usuario);
+        setResult(RESULT_OK,intent);
+        finish();
+        super.onBackPressed();
     }
 }

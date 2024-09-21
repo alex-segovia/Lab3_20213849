@@ -14,6 +14,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -57,12 +61,8 @@ public class PomodoroActivity extends AppCompatActivity {
             return insets;
         });
 
-        if (savedInstanceState != null){
-            usuario = (Usuario) savedInstanceState.getSerializable("usuario");
-        }else{
-            Intent intent = getIntent();
-            usuario = (Usuario)intent.getSerializableExtra("usuario");
-        }
+        Intent intent = getIntent();
+        usuario = (Usuario)intent.getSerializableExtra("usuario");
 
         TextView nombreUsuario = findViewById(R.id.nombresApellidos);
         String nuevoNombre = usuario.getFirstName() + " " + usuario.getLastName();
@@ -91,7 +91,7 @@ public class PomodoroActivity extends AppCompatActivity {
             botonReiniciarCuenta.setVisibility(View.VISIBLE);
 
             Data dataBuilder = new Data.Builder()
-                    .putInt("minutos", 3)
+                    .putInt("minutos", 25)
                     .build();
 
             WorkRequest workRequest = new OneTimeWorkRequest.Builder(ContadorWorker.class)
@@ -187,7 +187,7 @@ public class PomodoroActivity extends AppCompatActivity {
                                                 Intent intent = new Intent(PomodoroActivity.this, TareasActivity.class);
                                                 intent.putExtra("listaTareas",toDoDto.getTodos());
                                                 intent.putExtra("usuario",usuario);
-                                                startActivity(intent);
+                                                launcher.launch(intent);
                                             }
                                         }
                                     }
@@ -209,7 +209,7 @@ public class PomodoroActivity extends AppCompatActivity {
             textoInfoDescanso.setText("Descanso: 05:00");
 
             Data dataBuilder = new Data.Builder()
-                    .putInt("minutos", 3)
+                    .putInt("minutos", 25)
                     .build();
 
             WorkRequest workRequest = new OneTimeWorkRequest.Builder(ContadorWorker.class)
@@ -306,7 +306,7 @@ public class PomodoroActivity extends AppCompatActivity {
                                                 Intent intent = new Intent(PomodoroActivity.this, TareasActivity.class);
                                                 intent.putExtra("listaTareas",toDoDto.getTodos());
                                                 intent.putExtra("usuario",usuario);
-                                                startActivity(intent);
+                                                launcher.launch(intent);
                                             }
                                         }
                                     }
@@ -331,14 +331,25 @@ public class PomodoroActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId()==R.id.botonCerrarSesion){
+            WorkManager.getInstance(PomodoroActivity.this)
+                    .cancelAllWork();
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
 
+    ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult o) {
+            Intent datos = o.getData();
+            usuario = (Usuario) datos.getSerializableExtra("usuario");
+        }
+    });
+
     @Override
-    protected void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putSerializable("usuario",usuario);
+    public void onBackPressed() {
+        WorkManager.getInstance(PomodoroActivity.this)
+                .cancelAllWork();
+        super.onBackPressed();
     }
 }
